@@ -1,10 +1,13 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -25,6 +28,14 @@ public class Main {
 
         //exbir e manupular os dados
         for (Map<String, String> filme :ListaDeFilmes) {
+
+            String titulo = filme.get("title");
+            String nomeArquivo = titulo + ".png";
+            String URLImagem =  filme.get("image");
+            InputStream inputStream = new URL(URLImagem).openStream();
+            var geradora = new GeradoraDeFigurinhas();
+            geradora.criar(inputStream, nomeArquivo);
+
             System.out.print("\u001b[1mPosição Rank:\u001b[m " + filme.get("rank") + " - ");
 
             double classificacao = Double.parseDouble(filme.get("imDbRating"));

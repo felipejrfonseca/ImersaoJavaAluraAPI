@@ -1,53 +1,28 @@
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
-
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        //Fazer uma conexão HTTP e buscar os top 10 filmes
-        String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
-        URI endereco = URI.create(url);
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder(endereco).GET().build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        String body = response.body();
+        API api = API.IMDB_TOP_MOVIES;
+        String url = api.getUrl();
+        ExtratorDeConteudo extrator = api.getExtrator();
 
-        System.out.println(body);
-
-        //Extrair só os dados que interessam(titulo, poster e classificação)
-        JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> ListaDeFilmes = jsonParser.parse(body);
+        var http = new ClientHttp();
+        String json = http.buscaDeDados(url);
 
         //exbir e manupular os dados
-        for (Map<String, String> filme :ListaDeFilmes) {
+        List<Conteudo> conteudos = extrator.extraiConteudo(json);
 
-            String titulo = filme.get("title");
-            String nomeArquivo = titulo + ".png";
-            String URLImagem =  filme.get("image");
-            InputStream inputStream = new URL(URLImagem).openStream();
-            var geradora = new GeradoraDeFigurinhas();
-            geradora.criar(inputStream, nomeArquivo);
+        for (Conteudo conteudo : conteudos) {
+            InputStream inputStream= new  URL(conteudo.urlImagem()).openStream();
+            String nomeArquivo = conteudo.titulo() + ".png";
 
-            System.out.print("\u001b[1mPosição Rank:\u001b[m " + filme.get("rank") + " - ");
+            GeradoraDeFigurinhas.criar(inputStream, nomeArquivo);
 
-            double classificacao = Double.parseDouble(filme.get("imDbRating"));
-            int nEstrelas = (int)classificacao;
-
-            for (int i = 1; i <= nEstrelas; i++) {
-                System.out.print("⭐");
-            }
-
-            System.out.print("\n\u001b[1mTítulo:\u001b[m " + filme.get("title"));
-            System.out.print("\n\u001b[1mURL Poster:\u001b[m " + filme.get("image") + "\n\n\n");
-            //System.out.println(filme.get("imDbRating"));
+            System.out.println(conteudo.titulo());
         }
     }
 }

@@ -5,17 +5,14 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.FontMetrics;
 import java.io.File;
 import java.io.IOException;
-import java.awt.Font;
 import java.io.InputStream;
-import java.net.URL;
 
 
 public class GeradoraDeFigurinhas {
 
-    public void criar(InputStream inputStream, String nomeDoArquivo) throws IOException {
+    public static void criar(InputStream inputStream, String nomeDoArquivo) throws IOException {
 
         //Leitura da imagem
         BufferedImage imagemOriginal = ImageIO.read(inputStream);
@@ -59,7 +56,7 @@ public class GeradoraDeFigurinhas {
         graphics.setColor(Color.lightGray);
         graphics.draw(outline);
         graphics.setClip(outline);
-        
+
         //escrever a nova imagem em um arquivo
         ImageIO.write(novaImagem, "png", new File("ImersaoJavaAluraAPI/src/saida", nomeDoArquivo));
 
